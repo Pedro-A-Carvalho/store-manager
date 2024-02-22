@@ -12,6 +12,10 @@ const findProduct = async (req, res) => {
   return res.status(mapStatusHTTP(status)).json(data);
 };
 
+// const createProduct = async (req,res) => {
+//   const
+// }
+
 module.exports = {
   listProducts,
   findProduct,

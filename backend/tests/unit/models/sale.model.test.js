@@ -2,11 +2,11 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const connection = require('../../../src/models/connection');
 const saleModel = require('../../../src/models/sale.model');
-const { salesFromDb, saleFromDb, saleFromModel, salesFromModel } = require('../mocks/sale.mock');
+const { saleFromModel, salesFromModel } = require('../mocks/sale.mock');
 
 describe('Tests from Sale Model', function () {
   it('Should return an array of sales from /sales', async function () {
-    sinon.stub(connection, 'execute').resolves([salesFromDb]);
+    sinon.stub(connection, 'execute').resolves([salesFromModel]);
 
     const sales = await saleModel.getAll();
 
@@ -16,7 +16,7 @@ describe('Tests from Sale Model', function () {
   });
 
   it('Should return a single sale from /sales/:id', async function () {
-    sinon.stub(connection, 'execute').resolves([saleFromDb]);
+    sinon.stub(connection, 'execute').resolves([saleFromModel]);
 
     const sale = await saleModel.findById(1);
 
