@@ -1,4 +1,5 @@
 const { saleModel } = require('../models');
+const schema = require('./validations/validadeSaleInput');
 
 const getAllSales = async () => {
   const sales = await saleModel.getAll();
@@ -12,7 +13,18 @@ const getSaleByID = async (saleId) => {
   return { status: 'SUCCESSFUL', data: sale };
 };
 
+const insertSale = async (sale) => {
+  const error = schema.validateCreateSale(sale);
+  if (error) return { status: error.status, data: { message: error.message } };
+
+  const saleId = await saleModel.insert(sale);
+  // const newProduct = await productModel.findById(productId);
+
+  return { status: 'CREATED', data: { id: saleId, itemsSold: sale } };
+};
+
 module.exports = {
   getAllSales,
   getSaleByID,
+  insertSale,
 };

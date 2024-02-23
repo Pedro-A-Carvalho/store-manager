@@ -35,6 +35,29 @@ describe('Tests from Sale Service', function () {
     expect(sale.status).to.be.equal('NOT_FOUND');
     expect(sale.data.message).to.be.equal('Sale not found');
   });
+
+  it('Should insert a sale in the database', async function () {
+    sinon.stub(saleModel, 'insert').resolves(1);
+    // sinon.stub(saleModel, 'findById').resolves({ id: 1, name: 'sale Test' });
+
+    const sale = [
+      {
+        productId: 1,
+        quantity: 2,
+      },
+      {
+        productId: 2,
+        quantity: 3,
+      },
+    ];
+
+    const newSale = await saleService.insertSale(sale);
+
+    expect(newSale.status).to.be.equal('CREATED');
+    expect(newSale.data).to.be.an('object');
+    expect(newSale.data).to.be.deep.equal({ id: 1, itemsSold: sale });
+  });
+
   afterEach(function () {
     sinon.restore();
   });

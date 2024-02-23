@@ -37,8 +37,8 @@ describe('Tests from Product Service', function () {
   });
 
   it('Should insert a product in the database', async function () {
-    sinon.stub(productModel, 'insert').resolves({ insertId: 1 });
-    sinon.stub(productModel, 'findById').resolves({ id: 1, name: 'Product Test' });
+    sinon.stub(productModel, 'insert').resolves(1);
+    // sinon.stub(productModel, 'findById').resolves({ id: 1, name: 'Product Test' });
 
     const product = {
       name: 'Product Test',

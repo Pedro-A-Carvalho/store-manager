@@ -50,6 +50,31 @@ describe('Tests from Sale Controller', function () {
     expect(res.status).to.have.been.calledWith(404);
     expect(res.json).to.have.been.calledWith({ message: 'Sale not found' });
   });
+
+  it('Should insert a sale in the database', async function () {
+    const sale = [
+      {
+        productId: 1,
+        quantity: 2,
+      },
+      {
+        productId: 2,
+        quantity: 3,
+      },
+    ];
+    sinon.stub(saleService, 'insertSale').resolves({ status: 'CREATED', data: { id: 1, itemsSold: sale } });
+    const req = { body: sale };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await saleController.createSale(req, res);
+
+    expect(res.status).to.have.been.calledWith(201);
+    expect(res.json).to.have.been.calledWith({ id: 1, itemsSold: sale });
+  });
+
   afterEach(function () {
     sinon.restore();
   });

@@ -25,6 +25,26 @@ describe('Tests from Sale Model', function () {
     expect(sale).to.be.deep.equal(saleFromModel);
   });
 
+  it('Should insert a sale in the database', async function () {
+    sinon.stub(connection, 'execute').resolves([{ insertId: 1 }]);
+
+    const sale = [
+      {
+        productId: 1,
+        quantity: 2,
+      },
+      {
+        productId: 2,
+        quantity: 3,
+      },
+    ];
+
+    const saleId = await saleModel.insert(sale);
+
+    expect(saleId).to.be.a('number');
+    expect(saleId).to.be.equal(1);
+  });
+
   afterEach(function () {
     sinon.restore();
   });
