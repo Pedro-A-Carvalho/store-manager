@@ -1,8 +1,12 @@
-const { addSaleSchema } = require('./schemas');
+const { saleSchema } = require('./schemas');
 
 const validateCreateSale = (keysObjectToValidate) => {
-  const { error } = addSaleSchema.validate({ data: keysObjectToValidate });
-  if (error) return { status: 'INVALID_VALUE', message: error.message };
+  const errors = [];
+  keysObjectToValidate.forEach((item) => {
+    const { error } = saleSchema.validate(item);
+    if (error) errors.push({ status: 'INVALID_VALUE', message: error.message });
+  });
+  if (errors.length) return errors[0];
 };
 
 module.exports = {

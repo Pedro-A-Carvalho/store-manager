@@ -5,15 +5,11 @@ const productSchema = Joi.object({
 });
 
 const saleSchema = Joi.object({
-  productId: Joi.number().required(),
-  quantity: Joi.number().required(),
-});
-
-const addSaleSchema = Joi.object({
-  data: Joi.array().items(saleSchema).required(),
+  productId: Joi.number(),
+  quantity: Joi.number().integer().min(1).required(),
 });
 
 module.exports = {
   productSchema,
-  addSaleSchema,
+  saleSchema,
 };

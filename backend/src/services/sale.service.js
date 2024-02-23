@@ -1,4 +1,4 @@
-const { saleModel } = require('../models');
+const { saleModel, productModel } = require('../models');
 const schema = require('./validations/validadeSaleInput');
 
 const getAllSales = async () => {
@@ -16,6 +16,13 @@ const getSaleByID = async (saleId) => {
 const insertSale = async (sale) => {
   const error = schema.validateCreateSale(sale);
   if (error) return { status: error.status, data: { message: error.message } };
+
+  const promises = sale.map((item) => productModel.findById(item.productId));
+  const finished = await Promise.all(promises);
+
+  if (finished.some((product) => !product)) {
+    return { status: 'NOT_FOUND', data: { message: 'Product not found' } };
+  }
 
   const saleId = await saleModel.insert(sale);
   // const newProduct = await productModel.findById(productId);

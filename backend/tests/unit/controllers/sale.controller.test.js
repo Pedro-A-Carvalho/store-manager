@@ -4,6 +4,7 @@ const sinonChai = require('sinon-chai');
 const saleService = require('../../../src/services/sale.service');
 const saleController = require('../../../src/controllers/sale.controller');
 const { salesFromModel, saleFromModel } = require('../mocks/sale.mock');
+const { validateCreateSaleMiddleware } = require('../../../src/middlewares/saleFieldsValidator');
 
 const { expect } = chai;
 chai.use(sinonChai);
@@ -73,6 +74,50 @@ describe('Tests from Sale Controller', function () {
 
     expect(res.status).to.have.been.calledWith(201);
     expect(res.json).to.have.been.calledWith({ id: 1, itemsSold: sale });
+  });
+
+  it('Should fail to insert sale in the database if productId is not provided', async function () {
+    const req = { body: [{ quantity: 2 }] };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+    const next = sinon.stub().returns(); 
+
+    await validateCreateSaleMiddleware(req, res, next);
+
+    expect(res.status).to.have.been.calledWith(400);
+    expect(res.json).to.have.been.calledWith({ message: '"productId" is required' });
+    expect(next).to.have.not.been.calledWith();
+  });
+
+  it('Should fail to insert sale in the database if quantity is not provided', async function () {
+    const req = { body: [{ productId: 1 }] };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+    const next = sinon.stub().returns(); 
+
+    await validateCreateSaleMiddleware(req, res, next);
+
+    expect(res.status).to.have.been.calledWith(400);
+    expect(res.json).to.have.been.calledWith({ message: '"quantity" is required' });
+    expect(next).to.have.not.been.calledWith();
+  });
+
+  it('Should fail to insert sale in the database if quantity is lower than 1', async function () {
+    sinon.stub(saleService, 'insertSale').resolves({ status: 'INVALID_VALUE', data: { message: '"quantity" must be greater than or equal to 1' } });
+    const req = { body: [{ productId: 1, quantity: 0 }] };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await saleController.createSale(req, res);
+
+    expect(res.status).to.have.been.calledWith(422);
+    expect(res.json).to.have.been.calledWith({ message: '"quantity" must be greater than or equal to 1' });
   });
 
   afterEach(function () {
