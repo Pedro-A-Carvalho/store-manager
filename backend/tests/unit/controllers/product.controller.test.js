@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const productService = require('../../../src/services/product.service');
 const productController = require('../../../src/controllers/product.controller');
+const { validateCreateProductMiddleware } = require('../../../src/middlewares/productFieldsValidator');
 const { getAllProductsFromService, getProductByIDFromService, productsFromModel, singleProductFromModel, getProductByIDFromServiceNotFound } = require('../mocks/product.mock');
 
 const { expect } = chai;
@@ -63,6 +64,35 @@ describe('Tests from Product Controller', function () {
 
     expect(res.status).to.have.been.calledWith(201);
     expect(res.json).to.have.been.calledWith({ id: 1, name: 'Product Test' });
+  });
+
+  it('Should fail to insert product in the database if name is not provided', async function () {
+    const req = { body: {} };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+    const next = sinon.stub().returns(); 
+
+    await validateCreateProductMiddleware(req, res, next);
+
+    expect(res.status).to.have.been.calledWith(400);
+    expect(res.json).to.have.been.calledWith({ message: '"name" is required' });
+    expect(next).to.have.not.been.calledWith();
+  });
+
+  it('Should fail to insert product in the database if name smaller than 5 characters', async function () {
+    sinon.stub(productService, 'insertProduct').resolves({ status: 'INVALID_VALUE', data: { message: '"name" length must be at least 5 characters long' } });
+    const req = { body: { name: 'Test' } };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await productController.createProduct(req, res);
+
+    expect(res.status).to.have.been.calledWith(422);
+    expect(res.json).to.have.been.calledWith({ message: '"name" length must be at least 5 characters long' });
   });
 
   afterEach(function () {
