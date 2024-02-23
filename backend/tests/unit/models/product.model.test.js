@@ -24,6 +24,19 @@ describe('Tests from Product Model', function () {
     expect(product).to.be.deep.equal(singleProductFromDb);
   });
 
+  it('Should insert a product in the database', async function () {
+    sinon.stub(connection, 'execute').resolves([{ insertId: 1 }]);
+
+    const product = {
+      name: 'Product Test',
+    };
+
+    const productId = await productModel.insert(product);
+
+    expect(productId).to.be.a('number');
+    expect(productId).to.be.equal(1);
+  });
+
   afterEach(function () {
     sinon.restore();
   });

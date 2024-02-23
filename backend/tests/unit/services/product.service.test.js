@@ -36,6 +36,21 @@ describe('Tests from Product Service', function () {
     expect(product.data.message).to.be.equal('Product not found');
   });
 
+  it('Should insert a product in the database', async function () {
+    sinon.stub(productModel, 'insert').resolves({ insertId: 1 });
+    sinon.stub(productModel, 'findById').resolves({ id: 1, name: 'Product Test' });
+
+    const product = {
+      name: 'Product Test',
+    };
+
+    const newProduct = await productService.insertProduct(product);
+
+    expect(newProduct.status).to.be.equal('CREATED');
+    expect(newProduct.data).to.be.an('object');
+    expect(newProduct.data).to.be.deep.equal({ id: 1, name: 'Product Test' });
+  });
+
   afterEach(function () {
     sinon.restore();
   });
