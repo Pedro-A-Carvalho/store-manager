@@ -80,6 +80,25 @@ describe('Tests from Product Service', function () {
     expect(updatedProduct.data.message).to.be.equal('Product not found');
   });
 
+  it('Should delete a product from the database', async function () {
+    sinon.stub(productModel, 'deleteProduct').resolves();
+    sinon.stub(productModel, 'findById').resolves({ id: 1, name: 'Martelo de Jorge' });
+
+    const deletedProduct = await productService.deleteProduct(1);
+
+    expect(deletedProduct.status).to.be.equal('DELETED');
+  });
+
+  it('Should return a not found message from DELETE /products/:id', async function () {
+    sinon.stub(productModel, 'deleteProduct').resolves();
+    sinon.stub(productModel, 'findById').resolves(null);
+
+    const deletedProduct = await productService.deleteProduct(1);
+
+    expect(deletedProduct.status).to.be.equal('NOT_FOUND');
+    expect(deletedProduct.data.message).to.be.equal('Product not found');
+  });
+
   afterEach(function () {
     sinon.restore();
   });

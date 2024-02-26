@@ -31,10 +31,16 @@ const update = async (productId, dataToUpdate) => {
   const query = `UPDATE products SET ${columns} WHERE id = ?`;
   return connection.execute(query, [...Object.values(dataToUpdate), productId]);
 };
+
+const deleteProduct = async (productId) => {
+  const query = 'DELETE FROM products WHERE id = ?';
+  return connection.execute(query, [productId]);
+};
   
 module.exports = {
   getAll,
   findById,
   insert,
   update,
+  deleteProduct,
 };

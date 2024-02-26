@@ -140,6 +140,20 @@ describe('Tests from Product Controller', function () {
     expect(res.json).to.have.been.calledWith({ message: '"name" length must be at least 5 characters long' });
   });
 
+  it('Should delete a product from the database', async function () {
+    sinon.stub(productService, 'deleteProduct').resolves({ status: 'SUCCESSFUL' });
+    const req = { params: { id: 1 } };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      end: sinon.stub(),
+    };
+
+    await productController.deleteProduct(req, res);
+
+    expect(res.status).to.have.been.calledWith(200);
+    expect(res.end).to.have.been.calledWith();
+  });
+
   afterEach(function () {
     sinon.restore();
   });

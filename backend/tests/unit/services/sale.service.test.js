@@ -38,6 +38,7 @@ describe('Tests from Sale Service', function () {
 
   it('Should insert a sale in the database', async function () {
     sinon.stub(saleModel, 'insert').resolves(1);
+    sinon.stub(Promise, 'all').resolves([{}]);
     // sinon.stub(saleModel, 'findById').resolves({ id: 1, name: 'sale Test' });
 
     const sale = [

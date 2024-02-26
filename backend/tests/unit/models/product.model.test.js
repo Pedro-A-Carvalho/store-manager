@@ -52,6 +52,17 @@ describe('Tests from Product Model', function () {
     expect(updatedProduct[0].affectedRows).to.be.equal(1);
   });
 
+  it('Should delete a product from the database', async function () {
+    sinon.stub(connection, 'execute').resolves([{ affectedRows: 1 }]);
+
+    const productId = 1;
+
+    const deletedProduct = await productModel.deleteProduct(productId);
+
+    expect(deletedProduct).to.be.an('array');
+    expect(deletedProduct[0].affectedRows).to.be.equal(1);
+  });
+
   afterEach(function () {
     sinon.restore();
   });
