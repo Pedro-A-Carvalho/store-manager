@@ -14,7 +14,7 @@ const getProductByID = async (productId) => {
 };
 
 const insertProduct = async (product) => {
-  const error = schema.validateCreateProduct(product);
+  const error = schema.validateProduct(product);
   if (error) return { status: error.status, data: { message: error.message } };
 
   const productId = await productModel.insert(product);
@@ -23,8 +23,21 @@ const insertProduct = async (product) => {
   return { status: 'CREATED', data: { id: productId, ...product } };
 };
 
+const updateProduct = async (productId, product) => {
+  const error = schema.validateProduct(product);
+  if (error) return { status: error.status, data: { message: error.message } };
+
+  await productModel.update(productId, product);
+
+  const updatedProduct = await productModel.findById(productId);
+  if (!updatedProduct) return { status: 'NOT_FOUND', data: { message: 'Product not found' } };
+
+  return { status: 'SUCCESSFUL', data: updatedProduct };
+};
+
 module.exports = {
   getAllProducts,
   getProductByID,
   insertProduct,
+  updateProduct,
 };

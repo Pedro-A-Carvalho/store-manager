@@ -3,11 +3,13 @@ const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const productService = require('../../../src/services/product.service');
 const productController = require('../../../src/controllers/product.controller');
-const { validateCreateProductMiddleware } = require('../../../src/middlewares/productFieldsValidator');
+const { validateProductMiddleware } = require('../../../src/middlewares/productFieldsValidator');
 const { getAllProductsFromService, getProductByIDFromService, productsFromModel, singleProductFromModel, getProductByIDFromServiceNotFound } = require('../mocks/product.mock');
 
 const { expect } = chai;
 chai.use(sinonChai);
+
+const testName = 'Product Test';
 
 describe('Tests from Product Controller', function () {
   it('Should return an array of products from /products', async function () {
@@ -53,8 +55,8 @@ describe('Tests from Product Controller', function () {
   });
 
   it('Should insert a product in the database', async function () {
-    sinon.stub(productService, 'insertProduct').resolves({ status: 'CREATED', data: { id: 1, name: 'Product Test' } });
-    const req = { body: { name: 'Product Test' } };
+    sinon.stub(productService, 'insertProduct').resolves({ status: 'CREATED', data: { id: 1, name: testName } });
+    const req = { body: { name: testName } };
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.stub(),
@@ -63,7 +65,7 @@ describe('Tests from Product Controller', function () {
     await productController.createProduct(req, res);
 
     expect(res.status).to.have.been.calledWith(201);
-    expect(res.json).to.have.been.calledWith({ id: 1, name: 'Product Test' });
+    expect(res.json).to.have.been.calledWith({ id: 1, name: testName });
   });
 
   it('Should fail to insert product in the database if name is not provided', async function () {
@@ -74,7 +76,7 @@ describe('Tests from Product Controller', function () {
     };
     const next = sinon.stub().returns(); 
 
-    await validateCreateProductMiddleware(req, res, next);
+    await validateProductMiddleware(req, res, next);
 
     expect(res.status).to.have.been.calledWith(400);
     expect(res.json).to.have.been.calledWith({ message: '"name" is required' });
@@ -90,6 +92,49 @@ describe('Tests from Product Controller', function () {
     };
 
     await productController.createProduct(req, res);
+
+    expect(res.status).to.have.been.calledWith(422);
+    expect(res.json).to.have.been.calledWith({ message: '"name" length must be at least 5 characters long' });
+  });
+
+  it('Should update a product in the database', async function () {
+    sinon.stub(productService, 'updateProduct').resolves({ status: 'SUCCESSFUL', data: { id: 1, name: testName } });
+    const req = { params: { id: 1 }, body: { name: testName } };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await productController.updateProduct(req, res);
+
+    expect(res.status).to.have.been.calledWith(200);
+    expect(res.json).to.have.been.calledWith({ id: 1, name: testName });
+  });
+
+  it('Should fail to update product in the database if name is not provided', async function () {
+    const req = { params: { id: 1 }, body: {} };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+    const next = sinon.stub().returns(); 
+
+    await validateProductMiddleware(req, res, next);
+
+    expect(res.status).to.have.been.calledWith(400);
+    expect(res.json).to.have.been.calledWith({ message: '"name" is required' });
+    expect(next).to.have.not.been.calledWith();
+  });
+
+  it('Should fail to update product in the database if name smaller than 5 characters', async function () {
+    sinon.stub(productService, 'updateProduct').resolves({ status: 'INVALID_VALUE', data: { message: '"name" length must be at least 5 characters long' } });
+    const req = { params: { id: 1 }, body: { name: 'Test' } };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.stub(),
+    };
+
+    await productController.updateProduct(req, res);
 
     expect(res.status).to.have.been.calledWith(422);
     expect(res.json).to.have.been.calledWith({ message: '"name" length must be at least 5 characters long' });

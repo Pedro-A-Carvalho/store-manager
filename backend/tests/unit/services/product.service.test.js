@@ -26,7 +26,7 @@ describe('Tests from Product Service', function () {
     expect(product.data).to.be.deep.equal(singleProductFromModel);
   });
 
-  it('Should return a not found message from /products/:id', async function () {
+  it('Should return a not found message from GET /products/:id', async function () {
     sinon.stub(productModel, 'findById').resolves(null);
     
     const product = await productService.getProductByID(1);
@@ -49,6 +49,35 @@ describe('Tests from Product Service', function () {
     expect(newProduct.status).to.be.equal('CREATED');
     expect(newProduct.data).to.be.an('object');
     expect(newProduct.data).to.be.deep.equal({ id: 1, name: 'Product Test' });
+  });
+
+  it('Should update a product in the database', async function () {
+    sinon.stub(productModel, 'update').resolves();
+    sinon.stub(productModel, 'findById').resolves({ id: 1, name: 'Martelo do Batman' });
+
+    const product = {
+      name: 'Martelo do Batman',
+    };
+
+    const updatedProduct = await productService.updateProduct(1, product);
+
+    expect(updatedProduct.status).to.be.equal('SUCCESSFUL');
+    expect(updatedProduct.data).to.be.an('object');
+    expect(updatedProduct.data).to.be.deep.equal({ id: 1, name: 'Martelo do Batman' });
+  });
+
+  it('Should return a not found message from PUT /products/:id', async function () {
+    sinon.stub(productModel, 'update').resolves();
+    sinon.stub(productModel, 'findById').resolves(null);
+
+    const product = {
+      name: 'Martelo do Batman',
+    };
+
+    const updatedProduct = await productService.updateProduct(1, product);
+
+    expect(updatedProduct.status).to.be.equal('NOT_FOUND');
+    expect(updatedProduct.data.message).to.be.equal('Product not found');
   });
 
   afterEach(function () {

@@ -1,9 +1,10 @@
 const productRouter = require('express').Router();
 const { productController } = require('../controllers');
-const { validateCreateProductMiddleware } = require('../middlewares/productFieldsValidator');
+const { validateProductMiddleware } = require('../middlewares/productFieldsValidator');
 
 productRouter.get('/', productController.listProducts);
 productRouter.get('/:id', productController.findProduct);
-productRouter.post('/', validateCreateProductMiddleware, productController.createProduct);
+productRouter.post('/', validateProductMiddleware, productController.createProduct);
+productRouter.put('/:id', validateProductMiddleware, productController.updateProduct);
 
 module.exports = productRouter;

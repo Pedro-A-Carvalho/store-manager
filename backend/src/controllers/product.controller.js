@@ -17,8 +17,15 @@ const createProduct = async (req, res) => {
   return res.status(mapStatusHTTP(status)).json(data);
 };
 
+const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const { status, data } = await productService.updateProduct(id, req.body);
+  return res.status(mapStatusHTTP(status)).json(data);
+};
+
 module.exports = {
   listProducts,
   findProduct,
   createProduct,
+  updateProduct,
 };

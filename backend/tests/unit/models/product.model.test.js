@@ -37,6 +37,21 @@ describe('Tests from Product Model', function () {
     expect(productId).to.be.equal(1);
   });
 
+  it('Should update a product in the database', async function () {
+    sinon.stub(connection, 'execute').resolves([{ affectedRows: 1 }]);
+
+    const product = {
+      name: 'Product Test',
+    };
+
+    const productId = 1;
+
+    const updatedProduct = await productModel.update(productId, product);
+
+    expect(updatedProduct).to.be.an('array');
+    expect(updatedProduct[0].affectedRows).to.be.equal(1);
+  });
+
   afterEach(function () {
     sinon.restore();
   });
